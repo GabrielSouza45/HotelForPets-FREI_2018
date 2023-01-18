@@ -1,0 +1,248 @@
+public frmFolhaDePagamento2()
+        {
+            InitializeComponent();
+        }
+
+        void CarregarCombos()
+        {
+            FuncionarioBusiness business = new FuncionarioBusiness();
+            List<FuncionarioDTO> lista = business.Listar();
+
+            FuncionarioDTO dto = new FuncionarioDTO();
+
+            cboFuncionario.ValueMember = nameof(FuncionarioDTO.Id);
+            cboFuncionario.DisplayMember = nameof(FuncionarioDTO.Nome);
+            cboFuncionario.DataSource = lista;
+
+        }
+
+        private void frmFolhaDePagamento2_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
+
+
+            //private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+            //{
+
+            //}
+
+            //private void label46_Click(object sender, EventArgs e)
+            //{
+            //    this.Hide();
+            //    frmLogin tela = new frmLogin();
+            //    tela.Show();
+            //}
+
+            //private void panel1_Paint(object sender, PaintEventArgs e)
+            //{
+
+            //}
+
+            //private void groupBox1_Enter(object sender, EventArgs e)
+            //{
+
+
+
+            //}
+
+            //private void label20_Click(object sender, EventArgs e)
+            //{
+
+            //}
+
+            public void cboFuncionario_SelectedIndexChanged(object sender, EventArgs e)
+            {
+                FuncionarioDTO func = cboFuncionario.SelectedItem as FuncionarioDTO;
+               //label6.Text = Convert.ToString(func.Id);
+                lblDescontoVT.Text = Convert.ToString(func.VT);
+                lblDescontoSalario.Text = Convert.ToString(func.SalarioLiquido);
+                lblDescontoVR.Text = Convert.ToString(func.VR);
+                //lbldesc.Text = Convert.ToString(func.Convenio);
+                //label27.Text = Convert.ToString(func.Salario);
+
+                //label45.Text = Convert.ToString("0,00");
+
+            }
+
+
+
+
+
+            FuncionarioDTO funcionario = new FuncionarioDTO();
+
+
+            private void button1_Click(object sender, EventArgs e)
+            {
+                //Horas Trabalhadas
+
+                decimal SalarioNominal = Convert.ToDecimal(lblDescontoSalario.Text);
+
+                int horastrabalhadasdia = 8 * 5;
+                int HorasTrabalhadasMes = horastrabalhadasdia * 5;
+
+                decimal ValorHoraTrabalhada = SalarioNominal / HorasTrabalhadasMes;
+
+                //Atrasos 
+                decimal HorasAtraso = ValorHoraTrabalhada * nudAtrasos.Value;
+
+                //Faltas
+
+                decimal faltas = SalarioNominal / 30;
+                decimal valorfaltas = faltas * nudFaltas.Value;
+
+                //Valor Hora Extra Dia
+                decimal PorcentagemHoraExtra = (ValorHoraTrabalhada * 50) / 100;
+                decimal ValorHoraExtra = ValorHoraTrabalhada + PorcentagemHoraExtra;
+                decimal HorasExtras = ValorHoraExtra * nudHoraExtra.Value;
+
+                if (HorasExtras >= 1)
+                {
+                    decimal horasextrasdia = HorasExtras;
+
+                }
+                else
+                {
+                    lblProventosHExtra.Text = "0,00";
+                }
+
+
+                //Horas extras no feriado
+
+                decimal PorcentagemHoraExtraferiado = (ValorHoraTrabalhada * 100) / 100;
+                decimal ValorHoraExtraferiado = ValorHoraTrabalhada + PorcentagemHoraExtraferiado;
+                decimal HorasExtrasFeriado = ValorHoraExtraferiado * nudFaltas.Value;
+
+
+                if (HorasExtrasFeriado >= 1)
+                {
+                    decimal horasextrasdomingo = HorasExtrasFeriado;
+
+                }
+                else
+                {
+                    lblProventosHExtra.Text = "0,00";
+                }
+
+
+
+                decimal resultado = HorasExtras + HorasExtrasFeriado;
+                resultado = Math.Round(resultado, 2);
+                lblProventosHExtra.Text = Convert.ToString(resultado);
+
+
+                //Salario Base do INSS
+                decimal SalarioBruto = SalarioNominal + HorasExtras - HorasAtraso - valorfaltas;
+                decimal SalarioBaseINSS = SalarioBruto;
+
+                if (SalarioBaseINSS <= 1659.38m)
+                {
+                    decimal salario = (SalarioBaseINSS * 8) / 100;
+                    salario = Math.Round(salario, 2);
+                    lblDescontoINSS.Text = Convert.ToString(salario);
+                }
+                else if (SalarioBaseINSS >= 1659.39m && SalarioBaseINSS <= 2765.66m)
+                {
+                    decimal salario = (SalarioBaseINSS * 9) / 100;
+                    salario = Math.Round(salario, 2);
+                    lblDescontoINSS.Text = Convert.ToString(salario);
+
+                }
+                else if (SalarioBaseINSS >= 2765.67m)
+                {
+                    decimal salario = (SalarioBaseINSS * 11) / 100;
+                    salario = Math.Round(salario, 2);
+                    lblDescontoINSS.Text = Convert.ToString(salario);
+                }
+
+                //Imposto de Renda 
+                decimal BaseCalculoIR = SalarioBaseINSS - Convert.ToDecimal(lblDescontoINSS.Text);
+
+                if (BaseCalculoIR <= 1903.98m)
+                {
+                    lblDescontoIR.Text = "0,00";
+
+                }
+                else if (BaseCalculoIR >= 1903.99m && BaseCalculoIR <= 2826.65m)
+                {
+                    decimal imposto = (BaseCalculoIR * 7.5m) / 100;
+                    decimal reduzir = 142.80m;
+                    reduzir = Math.Round(reduzir, 2);
+                    lblDescontoIR.Text = Convert.ToString(reduzir);
+
+                }
+                else if (BaseCalculoIR >= 2826.66m && BaseCalculoIR <= 3751.05m)
+                {
+                    decimal imposto = (BaseCalculoIR * 15) / 100;
+                    decimal reduzir = 354.80m;
+                    reduzir = Math.Round(reduzir, 2);
+                    lblDescontoIR.Text = Convert.ToString(reduzir);
+
+                }
+                else if (BaseCalculoIR >= 3751.06m && BaseCalculoIR <= 4664.68m)
+                {
+                    decimal imposto = (BaseCalculoIR * 22.5m) / 100;
+                    decimal reduzir = 636.13m;
+                    reduzir = Math.Round(reduzir, 2);
+                    lblDescontoIR.Text = Convert.ToString(reduzir);
+                }
+                else if (BaseCalculoIR >= 4664.88m)
+                {
+                    decimal imposto = (BaseCalculoIR * 27.5m) / 100;
+                    decimal reduzir = 869.36m;
+                    reduzir = Math.Round(reduzir, 2);
+                    lblDescontoIR.Text = Convert.ToString(reduzir);
+                }
+
+                //FGTS
+                decimal fgts = (SalarioBaseINSS * 8) / 100;
+                fgts = Math.Round(fgts, 2);
+                lblDescontoFGTS.Text = Convert.ToString(fgts);
+
+
+                //Salario Liquido
+                decimal salarioliquido = SalarioNominal + -HorasAtraso - valorfaltas - Convert.ToDecimal(lblDescontoINSS.Text) - Convert.ToDecimal(lblDescontoFGTS.Text) - Convert.ToDecimal(lblProventosHExtra.Text);
+            salarioliquido = Math.Round(salarioliquido, 2);
+                lblSalarioLiquido.Text = Convert.ToString(salarioliquido);
+
+            }
+
+            private void btnSalvar_Click(object sender, EventArgs e)
+            {
+                //FolhaDePagamentoDTO dto = new FolhaDePagamentoDTO();
+                //dto.IdFuncionario = Convert.ToInt32(label6.Text);
+                //dto. = Convert.ToDecimal(label27.Text);
+                //dto.HorasExtras = Convert.ToDecimal(label29.Text);
+                //dto.ValeTransporte = Convert.ToDecimal(label30.Text);
+                //dto.ValeAlimentacao = Convert.ToDecimal(label32.Text);
+                //dto.ValeRefeicao = Convert.ToDecimal(label34.Text);
+                //dto.Convenio = Convert.ToDecimal(label36.Text);
+                //dto.FGTS = Convert.ToDecimal(label38.Text);
+                //dto.INSS = Convert.ToDecimal(label40.Text);
+                //dto.IR = Convert.ToDecimal(label42.Text);
+                //dto.SalarioFamilia = Convert.ToDecimal(label45.Text);
+                //dto.SalarioBruto = Convert.ToDecimal(label20.Text);
+                //dto.SalarioLiquido = Convert.ToDecimal(label23.Text);
+
+                //FolhadePagamentoBusiness business = new FolhadePagamentoBusiness();
+                //business.Salvar(dto);
+
+                //EnviarMensagem("Folha cadastrada com sucesso.");
+
+                //this.Hide();
+                //frmLogin tela = new frmLogin();
+                //tela.Show();
+
+            }
+
+            private void EnviarMensagem(string mensagem)
+            {
+                MessageBox.Show(mensagem, "Hambúrgueria Império",
+                         MessageBoxButtons.OK,
+                         MessageBoxIcon.Information);
+            }
+
+
+        }

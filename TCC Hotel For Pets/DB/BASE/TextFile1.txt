@@ -1,0 +1,563 @@
+﻿
+drop database if exists Tcc;
+
+CREATE DATABASE `Tcc`;
+
+USE `Tcc`;
+
+
+
+CREATE TABLE `tb_usuario` (
+	`id_usuario` INT NOT NULL AUTO_INCREMENT,
+	`nm_usuario` varchar(45) NOT NULL,
+	`ds_cpf` varchar(15) NOT NULL,
+	`ds_telefone` varchar(45) NOT NULL,
+	`ds_celular` varchar(45)  NULL,
+	`ds_email_usuario` varchar(45) NOT NULL,
+	`ds_senha_usuario` varchar(15) NOT NULL,
+	`bt_adm` boolean default false,
+    `bt_funcionario` boolean default false,
+	PRIMARY KEY (`id_usuario`)
+);
+ select * from tb_usuario;
+
+delete from tb_usuario where id_usuario = 6;
+
+CREATE TABLE `tb_cliente` (
+	`id_cliente` INT NOT NULL AUTO_INCREMENT,
+	`nm_nome` varchar(45) NOT NULL,
+	`ds_cpf` varchar(15) NOT NULL UNIQUE,
+	`ds_bairro` varchar(50) NOT NULL,
+	`ds_cep` INT NOT NULL,
+	`ds_rua` varchar(65) NOT NULL,
+	`ds_telefone` varchar(45) NOT NULL,
+	`ds_email_cliente` VARCHAR(45) NOT NULL UNIQUE,
+	`ds_senha_cliente` VARCHAR(15) NOT NULL,
+    `id_usuario` int,
+   
+	PRIMARY KEY (`id_cliente`)
+);
+select * from tb_cliente;
+-- delete from tb_cliente where id_cliente = 4;
+
+CREATE TABLE `tb_anicliente` (
+	`id_anicliente` int auto_increment not null,
+    `id_cliente` int,
+    `id_animal` int,
+    PRIMARY KEY (`id_anicliente`)
+);
+ select* from tb_anicliente;
+
+
+
+CREATE TABLE `tb_animal` (
+	`id_animal` INT NOT NULL AUTO_INCREMENT,
+	`ds_nome_animal` varchar(45) NOT NULL,
+	`ds_especie` varchar(45) NOT NULL,
+	`ds_pelagem` varchar(45) NOT NULL,
+	`ds_porte` varchar(45) NOT NULL,
+	`ds_raca` varchar(45) NOT NULL,
+	`ds_cor` varchar(45) NOT NULL,
+	`ds_castracao` varchar(3) NOT NULL,
+	`ds_carteira_vacinacao` varchar(45) NOT NULL,
+    
+	PRIMARY KEY (`id_animal`)
+);
+select * from tb_animal;
+-- select * from tb_pedido;
+
+CREATE TABLE `tb_funcionario` (
+	`id_funcionario` INT NOT NULL AUTO_INCREMENT,
+	`nm_nome` varchar(45) NOT NULL,
+    `ds_cep` INT NOT NULL,
+    `ds_rua` varchar(65) NOT NULL,
+    `nr_numero` varchar(7) NOT NULL,
+	`ds_bairro` varchar(45) NOT NULL,
+    `ds_cidade` varchar(45) NOT NULL,
+	`ds_estado` varchar(3) NOT NULL,
+    `ds_telefone` varchar(45) NOT NULL,
+    `ds_celular` varchar(45) not null,
+	`ds_cpf` varchar(15) NOT NULL,
+	`ds_cargo` varchar(45) NOT NULL,
+    `vl_vale_transporte` DECIMAL (7,2),
+    `vl_salario_liquido` DECIMAL(7,2) ,
+    `vl_vale_refeicao` DECIMAL(7,2) ,
+    `vl_convenio` DECIMAL(7,2),
+    `ds_email_funcionario` varchar(45) NOT NULL UNIQUE,
+	`ds_senha_funcionario` varchar(45) NOT NULL,
+	`ds_data_de_nascimento` DATE NOT NULL,
+    `bt_adm` bool NOT NULL,
+    `bt_funcionario` bool NOT NULL,
+	`id_usuario` int,
+	
+	PRIMARY KEY (`id_funcionario`)
+);
+ select * from tb_funcionario;
+ 
+ create view vw_consultar_adm as
+	select tb_funcionario.nm_nome,
+			tb_funcionario.ds_telefone,
+            tb_funcionario.ds_email_funcionario,
+            tb_funcionario.bt_adm
+		from tb_funcionario;
+  
+    SELECT * FROM tb_usuario where bt_adm = true ;
+ 
+CREATE TABLE IF NOT EXISTS tb_ponto (
+  id_ponto INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  dt_ponto DATE NOT NULL,
+  hr_entrada TIME NOT NULL,
+  hr_almoco_ida TIME NOT NULL,
+  hr_almoco_volta TIME NOT NULL,
+  hr_saida TIME NOT NULL,
+  hrs_trabalhadas_dia INT,
+  fk_ponto_funcionario INT NOT NULL,
+  FOREIGN KEY (fk_ponto_funcionario) references tb_funcionario(id_funcionario) on delete cascade on update cascade
+);
+
+
+
+
+
+
+create VIEW vw_consultar_ponto as 
+select tb_ponto.id_ponto,
+	   tb_funcionario.nm_nome,
+       tb_ponto.dt_ponto,
+       tb_ponto.hr_entrada,
+       tb_ponto.hr_almoco_ida,
+       tb_ponto.hr_almoco_volta,
+       tb_ponto.hr_saida,
+       tb_ponto.hrs_trabalhadas_dia
+  from tb_ponto
+  join tb_funcionario
+	on tb_ponto.fk_ponto_funcionario = tb_funcionario.id_funcionario
+GROUP
+   by  tb_ponto.id_ponto,
+	   tb_funcionario.nm_nome,
+       tb_ponto.dt_ponto,
+       tb_ponto.hr_entrada,
+       tb_ponto.hr_almoco_ida,
+       tb_ponto.hr_almoco_volta,
+       tb_ponto.hr_saida,
+	   tb_ponto.hrs_trabalhadas_dia;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+create TABLE `tb_fornecedor` (
+	`id_fornecedor` INT NOT NULL AUTO_INCREMENT,
+	`nm_nome` varchar(45) NOT NULL,
+	`ds_telefone` varchar(45) NOT NULL,
+    `ds_cidade` varchar(45),
+    `ds_estado` varchar(45),
+    `ds_bairro` varchar(45),
+    `ds_rua` varchar(45),
+    `nr_numero` varchar(45),
+    `ds_cep` varchar(11),
+	PRIMARY KEY (`id_fornecedor`)
+);
+-- select * from tb_fornecedor;
+       
+
+  
+  
+create table `tb_gastos`(
+ id_gasto INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+ nm_gasto VARCHAR(100),
+ dt_gasto DATE,     
+ ds_tipo  VARCHAR(150),
+ vl_gasto DECIMAL(15,2)
+ );
+ 
+-- select * from tb_funcionario;
+
+-- select * from tb_usuario;
+
+CREATE TABLE `tb_produto_compra`(
+	`id_produto` INT NOT NULL AUTO_INCREMENT,
+	`nm_produto` varchar(45) NOT NULL,
+	`vl_preco_compra` DECIMAL(7,2) NOT NULL,
+    `vl_preco_venda` DECIMAL(7,2) NOT NULL,
+	`id_fornecedor` INT NOT NULL,
+	PRIMARY KEY (`id_produto`)
+);
+
+CREATE TABLE `tb_estoque` (
+	`id_estoque` INT NOT NULL AUTO_INCREMENT,
+	`qt_produto` int NOT NULL,
+	`produto_id_produto` INT NOT NULL,
+	PRIMARY KEY (`id_estoque`)
+);
+
+
+  CREATE TABLE IF NOT EXISTS `tb_pedido_compra` (
+  id_pedido_compra INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  dt_compra date,
+  fk_fornecedor INT NOT NULL,
+  foreign key(fk_fornecedor) references tb_fornecedor(id_fornecedor)
+);
+  
+  CREATE TABLE `tb_compra_item` (
+    id_compra_item INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    fk_produto_compra INT NOT NULL,
+    fk_pedido_compra INT NOT NULL,
+    FOREIGN KEY (fk_produto_compra) REFERENCES tb_produto_compra (id_produto) on delete cascade on update cascade,
+    FOREIGN KEY (fk_pedido_compra) REFERENCES tb_pedido_compra (id_pedido_compra) on delete cascade on update cascade
+);
+
+
+CREATE TABLE IF NOT EXISTS `tb_pedido_venda` (
+  id_pedido_venda INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  dt_venda date,
+  fk_usuario INT NOT NULL,
+  foreign key(fk_usuario) references tb_usuario(id_usuario) on delete cascade on update cascade
+);
+
+Create table `tb_venda_item` (
+id_venda_item INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+fk_produto_venda INT NOT NULL,
+fk_pedido_venda INT NOT NULL,
+foreign key (fk_produto_venda) references tb_produto_compra(id_produto),
+foreign key (fk_pedido_venda) references tb_pedido_venda(id_pedido_venda)
+);
+
+CREATE TABLE IF NOT EXISTS `tb_folha_de_pagamento` (
+  id_folha_de_pagamento INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  vl_salario DECIMAL(16,2) NOT NULL,
+  vl_vt DECIMAL(16,2),
+  vl_vr DECIMAL(16,2),
+  vl_convenio DECIMAL(16,2),
+  vl_fgts DECIMAL(16,2) NOT NULL,
+  vl_inss DECIMAL(16,2),
+  vl_ir DECIMAL(16,2),
+  vl_horasextras DECIMAL(16,2),
+  vl_bruto DECIMAL(16,2) NOT NULL,
+  vl_liquido DECIMAL(16,2) NOT NULL,
+  dt_pagamento DATE,
+  fk_id_funcionario INT NOT NULL,
+  foreign key(fk_id_funcionario) references tb_funcionario(id_funcionario)
+ );
+
+select * from tb_folha_de_pagamento;
+select * from tb_funcionario;
+       
+
+CREATE TABLE `tb_folha_funcionario` (
+	`id_folha` INT NOT NULL auto_increment,
+    `pagm_id_folha_de_pagamento` INT NOT NULL,
+    `func_id_funcionario` INT NOT NULL,
+    PRIMARY KEY (`id_folha`)
+);
+
+
+CREATE TABLE `tb_fluxo_de_caixa` (
+	`id_fluxo_de_caixa` INT NOT NULL AUTO_INCREMENT,
+	`ds_descricao` INT NOT NULL,
+	`ds_valor` DECIMAL(7,2) NOT NULL,
+	`ds_saldo_atual` DECIMAL(7,2) NOT NULL,
+	`vl_saldo_dia` DECIMAL(7,2) NOT NULL,
+	`vl_subtotal` DECIMAL(7,2) NOT NULL,
+	`id_pedido` INT NOT NULL,
+	PRIMARY KEY (`id_fluxo_de_caixa`)
+);
+
+-- select * from tb_estoque;
+
+
+
+ALTER TABLE `tb_folha_funcionario` ADD CONSTRAINT `tb_folha_funcionario_fk0` FOREIGN KEY (`pagm_id_folha_de_pagamento`) REFERENCES `tb_folha_de_pagamento`(`id_folha_de_pagamento`);
+
+ALTER TABLE `tb_folha_funcionario` ADD CONSTRAINT `tb_folha_funcionario_fk1` FOREIGN KEY (`func_id_funcionario`) REFERENCES `tb_funcionario`(`id_funcionario`);
+
+ALTER TABLE `tb_produto_compra` ADD CONSTRAINT `tb_produto_compra_fk0` FOREIGN KEY (`id_fornecedor`) REFERENCES `tb_fornecedor`(`id_fornecedor`) on delete cascade on update cascade;
+
+ALTER TABLE `tb_estoque` ADD CONSTRAINT `tb_estoque_fk0` FOREIGN KEY (`Produto_id_produto`) REFERENCES `tb_produto_compra`(`id_produto`) on delete cascade on update cascade;
+
+ALTER TABLE `tb_funcionario` ADD CONSTRAINT `tb_funcionario_fk0` FOREIGN KEY (`id_usuario`) REFERENCES `tb_usuario`(`id_usuario`);
+
+ALTER TABLE `tb_cliente` ADD CONSTRAINT `tb_cliente_fk0` FOREIGN KEY (`id_usuario`) REFERENCES `tb_usuario`(`id_usuario`);
+
+ALTER TABLE `tb_anicliente` ADD CONSTRAINT `tb_anicliente_fk0` FOREIGN KEY (`id_cliente`) REFERENCES `tb_cliente`(`id_cliente`);
+
+ALTER TABLE `tb_anicliente` ADD CONSTRAINT `tb_anicliente_fk1` FOREIGN KEY (`id_animal`) REFERENCES `tb_animal`(`id_animal`);
+
+
+
+-- select * from VW_PRODUTO_CONSULTA;
+Create View vw_consultar_produto_compra as 
+	 select tb_produto_compra.id_produto,
+			tb_produto_compra.nm_produto,
+            tb_produto_compra.vl_preco_compra,
+            tb_produto_compra.vl_preco_venda,
+            tb_fornecedor.nm_nome
+       from tb_produto_compra
+       join tb_fornecedor
+         on tb_produto_compra.id_fornecedor = tb_fornecedor.id_fornecedor
+GROUP 
+		 BY tb_produto_compra.id_produto,
+			tb_produto_compra.nm_produto,
+            tb_produto_compra.vl_preco_compra,
+            tb_produto_compra.vl_preco_venda,
+            tb_fornecedor.nm_nome;
+
+
+create view vw_consultar_folha as 
+select tb_folha_de_pagamento.id_folha_de_pagamento,
+	   tb_funcionario.nm_nome,
+       tb_folha_de_pagamento.vl_bruto,
+       tb_folha_de_pagamento.vl_horasextras,
+       tb_folha_de_pagamento.dt_pagamento,
+       tb_folha_de_pagamento.vl_liquido
+  from tb_folha_de_pagamento
+  join tb_funcionario
+	on tb_folha_de_pagamento.fk_id_funcionario = tb_funcionario.id_funcionario
+GROUP 
+   by  tb_folha_de_pagamento.id_folha_de_pagamento,
+	   tb_funcionario.nm_nome,
+       tb_folha_de_pagamento.vl_bruto,
+       tb_folha_de_pagamento.vl_horasextras,
+       tb_folha_de_pagamento.dt_pagamento,
+       tb_folha_de_pagamento.vl_liquido;
+
+
+
+CREATE VIEW VW_CONSULTAR_FUNCIONARIO AS
+	select 	tb_folha_funcionario.id_folha,
+			tb_funcionario.id_funcionario,
+            tb_funcionario.nm_nome,
+            tb_funcionario.ds_cargo,
+            tb_funcionario.ds_telefone,
+            tb_funcionario.ds_email_funcionario,
+            tb_funcionario.vl_salario_liquido,
+            tb_folha_de_pagamento.id_folha_de_pagamento
+	from tb_folha_funcionario
+    join tb_funcionario
+    on	tb_folha_funcionario.func_id_funcionario
+    join tb_folha_de_pagamento
+    on	tb_folha_funcionario.pagm_id_folha_de_pagamento;
+        
+   -- select * from VW_CONSULTAR_FUNCIONARIO;
+    
+   
+   create VIEW vw_pedido_consultar AS 
+	SELECT tb_pedido_compra.id_pedido_compra,
+		   tb_fornecedor.nm_nome,
+           tb_produto_compra.id_produto,
+		   count(tb_compra_item.id_compra_item) 	as qtd_itens,
+           sum(tb_produto_compra.vl_preco_compra)		 	as vl_total
+      FROM tb_pedido_compra
+      JOIN tb_compra_item
+        ON tb_pedido_compra.id_pedido_compra = tb_compra_item.fk_pedido_compra
+	  JOIN tb_produto_compra
+        ON tb_compra_item.fk_produto_compra = tb_produto_compra.id_produto
+	  JOIN tb_fornecedor
+        ON tb_fornecedor.id_fornecedor = tb_pedido_compra.fk_fornecedor
+        
+	 GROUP 
+	    BY tb_pedido_compra.id_pedido_compra,
+		   tb_fornecedor.nm_nome,
+           tb_produto_compra.id_produto;
+
+   
+     -- select * from vw_pedido_consultar;
+   -- select * from vw_consultar_estoque;
+    
+   create VIEW VW_ANIMAL_CONSULTA AS
+	select tb_anicliente.id_anicliente,
+		   tb_anicliente.id_cliente,
+		   tb_anicliente.id_animal,
+           tb_animal.ds_nome_animal,
+           tb_animal.ds_especie,
+           tb_animal.ds_pelagem,
+           tb_animal.ds_porte,
+           tb_animal.ds_raca,
+           tb_animal.ds_cor,
+           tb_animal.ds_castracao,
+           tb_animal.ds_carteira_vacinacao,
+		   tb_cliente.nm_nome
+	  from tb_anicliente
+	  join tb_animal
+		on tb_anicliente.id_animal = tb_animal.id_animal
+	  join tb_cliente
+        on tb_anicliente.id_cliente = tb_cliente.id_cliente;
+      
+	
+    create view vw_consultar_estoque as
+ select tb_estoque.id_estoque,
+        tb_produto_compra.nm_produto,
+		tb_estoque.qt_produto,
+		tb_fornecedor.nm_nome,
+        tb_produto_compra.vl_preco_venda,
+        tb_produto_compra.id_produto
+   from tb_estoque
+   join tb_produto_compra 
+     on tb_estoque.Produto_id_produto = tb_produto_compra.id_produto
+   join tb_fornecedor
+	 on tb_produto_compra.id_fornecedor = tb_fornecedor.id_fornecedor
+GROUP 
+   BY   tb_estoque.id_estoque,
+        tb_produto_compra.nm_produto,
+		tb_estoque.qt_produto,
+		tb_fornecedor.nm_nome,
+        tb_produto_compra.vl_preco_venda,
+        tb_produto_compra.id_produto;
+
+
+
+create VIEW VW_PRODUTO_CONSULTA AS
+	select tb_produto_compra.id_produto,
+		   tb_produto_compra.nm_produto,
+		   tb_produto_compra.vl_preco_compra,
+           tb_produto_compra.vl_preco_venda,
+           tb_fornecedor.id_fornecedor,
+		   tb_fornecedor.nm_nome
+	  from tb_produto_compra
+	  join tb_fornecedor
+		on tb_produto_compra.id_fornecedor = tb_fornecedor.id_fornecedor;
+
+
+
+       
+	
+       
+       
+       
+        create VIEW vw_pedido_venda_consultar AS 
+	SELECT tb_pedido_venda.id_pedido_venda,
+		   tb_usuario.nm_usuario,
+           tb_pedido_venda.dt_venda,
+           tb_produto_compra.id_produto,
+		   count(tb_venda_item.id_venda_item) 	as qtd_itens,
+           sum(tb_produto_compra.vl_preco_venda) as vl_total
+      FROM tb_pedido_venda
+      JOIN tb_venda_item
+        ON tb_pedido_venda.id_pedido_venda = tb_venda_item.fk_pedido_venda
+	  JOIN tb_produto_compra
+        ON tb_venda_item.fk_produto_venda = tb_produto_compra.id_produto
+	  JOIN tb_usuario
+        ON tb_usuario.id_usuario = tb_pedido_venda.fk_usuario
+	 GROUP 
+	    BY tb_pedido_venda.id_pedido_venda,
+		   tb_usuario.nm_usuario,
+           tb_pedido_venda.dt_venda,
+           tb_produto_compra.id_produto;
+
+    
+ select * from vw_pedido_venda_consultar;  
+
+    
+    /*VIEW DE GANHOS */
+
+
+create view vw_ganhos as
+select date(dt_venda)		dt_referencia,
+			   sum(vl_preco_venda) 	vl_total
+		  from tb_pedido_venda		pe
+		  join tb_venda_item	pi
+			on pe.id_pedido_venda 	= pi.fk_pedido_venda
+		  join tb_produto_compra		p
+			on pi.fk_produto_venda		= p.id_produto
+		 group
+			by date(dt_venda);
+
+select * from vw_ganhos;
+
+
+
+/*VIEW DE DESPESAS COM FOLHA DE PAGAMENTO */
+
+
+create view vw_despesas as
+            select sum(vl_total) vl_total, dt_referencia
+            from
+            (
+select date(dt_compra)			dt_referencia,
+			   sum(vl_preco_compra) 	vl_total
+		  from tb_pedido_compra		c
+		  join tb_compra_item	ci
+			on c.id_pedido_compra 		= ci.fk_pedido_compra
+		  join tb_produto_compra		p
+			on p.id_produto 		= ci.fk_produto_compra
+		 group
+			by date(dt_compra)
+         UNION
+         select date(dt_gasto)	dt_referencia,
+			    sum(vl_gasto)		vl_total
+		   from tb_gastos
+		  group
+		  	 by date(dt_gasto)
+             UNION
+         select date(dt_pagamento)	dt_referencia,
+			    sum(vl_liquido)		vl_total
+		   from tb_folha_de_pagamento
+		  group
+		  	 by dt_pagamento)despesa
+             GROUP BY dt_referencia;
+
+
+		  
+          
+          /*VIEW CORDENADORA QUE PUXA AS DUAS VIEW E FAZ A CONTA DO SALDO*/
+
+          
+         create view vw_consultar_fluxodecaixa as
+   SELECT dt_referencia,
+		   ifnull(vl_total_ganhos, 0)		vl_total_ganhos,
+           ifnull(vl_total_despesas, 0)		vl_total_despesas,
+		   ifnull(vl_total_ganhos - vl_total_despesas,0) vl_saldo
+      FROM 
+        (
+			SELECT g.dt_referencia,
+				   g.vl_total		vl_total_ganhos,
+                   d.vl_total		vl_total_despesas
+			  FROM vw_ganhos		g		
+		 LEFT JOIN vw_despesas		d
+				ON g.dt_referencia  = d.dt_referencia
+			 UNION
+			SELECT d.dt_referencia,
+				   g.vl_total		vl_total_ganhos,
+                   d.vl_total		vl_total_despesas
+			  FROM vw_ganhos		g		
+		 RIGHT JOIN vw_despesas		d
+				ON g.dt_referencia  = d.dt_referencia
+        ) tb_Fluxo;
+        
+        select * from vw_consultar_fluxodecaixa;
+
+    
+insert into tb_usuario (nm_usuario, ds_cpf, ds_telefone, ds_celular, ds_email_usuario, ds_senha_usuario, bt_adm, bt_funcionario)
+		values ("admin", "12345678963", "(11)56472358", "", "admin@admin.com", "123", true, false);
+        
+insert into tb_usuario (nm_usuario, ds_cpf, ds_telefone, ds_celular, ds_email_usuario, ds_senha_usuario, bt_adm, bt_funcionario)
+		values ("Func", "78945612314", "(11)58945674", "", "func@func.com", "123", false, true);
+        
+    
+insert into tb_fornecedor (nm_nome, ds_telefone, ds_cidade, ds_estado, ds_bairro, ds_rua, nr_numero, ds_cep) values ("Raffa Moreira", "1156568989", "São Paulo", "SP", "Pernambuco", "Bandeiras", "45", "59862358");
+insert into tb_fornecedor (nm_nome, ds_telefone, ds_cidade, ds_estado, ds_bairro, ds_rua, nr_numero, ds_cep) values ("Black Fraude", "1145786685", "São Paulo", "SP", "Pernambuco", "Bandeiras", "25", "59862358");
+insert into tb_fornecedor (nm_nome, ds_telefone, ds_cidade, ds_estado, ds_bairro, ds_rua, nr_numero, ds_cep) values ("Stock Infinity", "1169658894", "São Paulo", "SP", "Pernambuco", "Bandeiras", "78", "59862358");
+insert into tb_fornecedor (nm_nome, ds_telefone, ds_cidade, ds_estado, ds_bairro, ds_rua, nr_numero, ds_cep) values ("Pubris", "1178459632", "São Paulo", "SP", "Pernambuco", "Bandeiras", "154", "59862358");
+
+
+-- insert into tb_produto_compra (nm_produto, vl_preco_compra, vl_preco_venda, dt_data_compra, id_fornecedor) values ("Botas Pretas", 10.99, 15.99,  "2018/10/27", 1);
+-- insert into tb_produto_compra (nm_produto, vl_preco_compra, vl_preco_venda, dt_data_compra, id_fornecedor) values ("Bolinha de borracha", 10.49, 20, "2018/10/27", 3);
+-- insert into tb_produto_compra (nm_produto, vl_preco_compra, vl_preco_venda, dt_data_compra, id_fornecedor) values ("Pelucia", 45.20, 58.50, "2018/10/27", 2);
+
